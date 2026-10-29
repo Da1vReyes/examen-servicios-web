@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: tecnouam-postgres
+    environment:
+      POSTGRES_DB: tecnouam
+      POSTGRES_USER: tecnouam
+      POSTGRES_PASSWORD: tecnouam
+    ports:
+      - "5432:5432"
+    volumes:
+      - tecnouam-data:/var/lib/postgresql/data
+
+volumes:
+  tecnouam-data:
