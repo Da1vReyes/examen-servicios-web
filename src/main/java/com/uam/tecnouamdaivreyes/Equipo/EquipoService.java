@@ -1,5 +1,7 @@
 package com.uam.tecnouamdaivreyes.Equipo;
 
+import com.uam.tecnouamdaivreyes.Prestamo.EstadoPrestamo;
+import com.uam.tecnouamdaivreyes.Prestamo.PrestamoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,9 +14,11 @@ import java.util.List;
 public class EquipoService {
 
     private final EquipoRepository equipoRepository;
+    private final PrestamoRepository prestamoRepository;
 
-    public EquipoService(EquipoRepository equipoRepository) {
+    public EquipoService(EquipoRepository equipoRepository, PrestamoRepository prestamoRepository) {
         this.equipoRepository = equipoRepository;
+        this.prestamoRepository = prestamoRepository;
     }
 
     @Transactional(readOnly = true)
@@ -42,9 +46,12 @@ public class EquipoService {
 
     public void eliminar(Long id) {
         Equipo equipo = buscar(id);
-        if (equipo.getEstado() == EstadoEquipo.PRESTADO) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "No se puede eliminar un equipo prestado");
+        if (prestamoRepository.existsByEquipoIdAndEstado(id, EstadoPrestamo.ACTIVO)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "No se puede eliminar un equipo con prestamos activos");
         }
+        // Los prestamos ya devueltos son historial del equipo y se eliminan con el.
+        prestamoRepository.deleteAll(equipo.getPrestamos());
         equipoRepository.delete(equipo);
         equipoRepository.flush();
     }
