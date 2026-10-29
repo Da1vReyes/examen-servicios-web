@@ -45,7 +45,7 @@ public class PrestamoController {
         return prestamoService.actualizar(id, request);
     }
 
-    @PostMapping("/{id}/devolver")
+    @PutMapping("/{id}/devolver")
     public PrestamoResponse devolver(@PathVariable Long id) {
         return prestamoService.devolver(id);
     }
